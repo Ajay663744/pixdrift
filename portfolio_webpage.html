@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIXDRIFT | Portfolio</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        display: ['"Syne"', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: '#050505',
+                        darker: '#020202',
+                        accent: {
+                            500: '#8b5cf6', // Purple
+                            600: '#ec4899', // Pink
+                            700: '#3b82f6', // Blue
+                        }
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'marquee': 'marquee 25s linear infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        marquee: {
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-100%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #050505;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        /* Ferrofluid Background Canvas */
+        #ferrofluid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Semi-transparent section backgrounds to let ferrofluid show through */
+        #services, #about { background-color: rgba(2, 2, 2, 0.88) !important; }
+        #work { background-color: rgba(5, 5, 5, 0.88) !important; }
+        #contact { background-color: rgba(5, 5, 5, 0.90) !important; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Subtle Noise Overlay for texture */
+        .noise-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, #8b5cf6, #ec4899, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .project-card:hover .project-overlay {
+            opacity: 1;
+        }
+
+        .project-card:hover img,
+        .project-card:hover video {
+            transform: scale(1.05);
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+</head>
+
+<body class="antialiased selection:bg-accent-500 selection:text-white relative">
+
+    <!-- Ferrofluid WebGL Background -->
+    <canvas id="ferrofluid-bg"></canvas>
+
+    <div class="noise-bg"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 top-0 transition-all duration-300" id="navbar">
+        <div
+            class="glass-panel mx-auto max-w-7xl px-6 py-4 mt-4 rounded-full flex justify-between items-center w-[95%] lg:w-full relative z-50">
+            <a href="#" class="font-display font-bold text-xl tracking-wider text-white hover-target relative z-50">
+                PIXDRIFT<span class="text-accent-500">.</span>
+            </a>
+
+            <!-- Desktop Links -->
+            <div class="hidden md:flex space-x-8 text-sm font-medium text-gray-300">
+                <a href="#services" class="hover:text-white transition-colors hover-target">Services</a>
+                <a href="#work" class="hover:text-white transition-colors hover-target">Work</a>
+                <a href="#about" class="hover:text-white transition-colors hover-target">About</a>
+            </div>
+
+            <div class="hidden md:block">
+                <a href="#contact"
+                    class="bg-white text-black px-6 py-2 rounded-full font-semibold text-sm hover:scale-105 transition-transform hover-target">
+                    Let's Talk
+                </a>
+            </div>
+
+            <!-- Mobile Menu Toggle Button -->
+            <button id="mobile-menu-btn" class="md:hidden text-white focus:outline-none p-2 relative z-50">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
+                    </path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu"
+            class="fixed inset-0 bg-darker/95 backdrop-blur-xl z-40 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+            <div class="flex flex-col items-center space-y-8 text-2xl font-display font-bold">
+                <a href="#services" class="mobile-link text-gray-300 hover:text-white transition-colors">Services</a>
+                <a href="#work" class="mobile-link text-gray-300 hover:text-white transition-colors">Work</a>
+                <a href="#about" class="mobile-link text-gray-300 hover:text-white transition-colors">About</a>
+                <a href="#contact"
+                    class="mobile-link mt-8 px-8 py-3 bg-gradient-to-r from-accent-500 to-accent-600 text-white rounded-full text-lg shadow-lg shadow-accent-500/20">Let's
+                    Talk</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+        <!-- Interactive Canvas Background -->
+        <canvas id="hero-canvas" class="absolute inset-0 w-full h-full z-0 opacity-40"></canvas>
+
+        <!-- Ambient Glowing Blobs -->
+        <div
+            class="absolute top-1/4 left-1/4 w-72 h-72 bg-accent-500 rounded-full mix-blend-screen filter blur-[100px] opacity-30 animate-blob z-0">
+        </div>
+        <div
+            class="absolute top-1/3 right-1/4 w-72 h-72 bg-accent-600 rounded-full mix-blend-screen filter blur-[100px] opacity-30 animate-blob animation-delay-2000 z-0">
+        </div>
+        <div
+            class="absolute bottom-1/4 left-1/2 w-72 h-72 bg-accent-700 rounded-full mix-blend-screen filter blur-[100px] opacity-30 animate-blob animation-delay-4000 z-0">
+        </div>
+
+        <div class="relative z-10 max-w-5xl mx-auto px-6 text-center pt-20">
+            <div
+                class="inline-block mb-4 px-4 py-1 rounded-full glass-panel text-xs font-medium text-gray-300 tracking-widest uppercase gs-reveal">
+                Available for freelance projects
+            </div>
+            <h1 class="font-display text-5xl md:text-7xl lg:text-8xl font-bold leading-tight mb-6 gs-reveal">
+                Crafting <span class="text-gradient">Digital</span> <br> Experiences & <span
+                    class="italic text-gray-400">Motion</span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10 font-light gs-reveal">
+                I build immersive websites for forward-thinking businesses and create dynamic motion design for
+                innovative products.
+            </p>
+            <div
+                class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6 gs-reveal">
+                <a href="#work"
+                    class="px-8 py-4 bg-white text-black rounded-full font-semibold hover:bg-gray-200 transition-colors hover-target flex items-center">
+                    View My Work
+                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                </a>
+                <a href="#services"
+                    class="px-8 py-4 glass-panel text-white rounded-full font-medium hover:bg-white/10 transition-colors hover-target">
+                    Our Services
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <section id="services" class="py-32 relative bg-darker">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="mb-16 md:flex justify-between items-end gs-reveal">
+                <div>
+                    <h2 class="font-display text-4xl md:text-5xl font-bold mb-4">What I Do</h2>
+                    <p class="text-gray-400 max-w-md">Transforming ideas into visually stunning and highly functional
+                        digital realities.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Service 1: Web Development -->
+                <div
+                    class="glass-panel p-10 rounded-3xl relative overflow-hidden group hover:-translate-y-2 transition-transform duration-300 gs-reveal">
+                    <div
+                        class="absolute top-0 right-0 w-32 h-32 bg-accent-700 filter blur-[80px] opacity-20 group-hover:opacity-40 transition-opacity">
+                    </div>
+                    <div
+                        class="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mb-8 border border-white/10">
+                        <svg class="w-6 h-6 text-accent-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-display text-2xl font-bold mb-4">Web Development</h3>
+                    <p class="text-gray-400 mb-6 leading-relaxed">
+                        Custom, high-performance websites built for businesses that want to stand out. From landing
+                        pages to full web applications, emphasizing mindblowing UI and seamless UX.
+                    </p>
+                    <ul class="space-y-3 text-sm text-gray-300 font-medium">
+                        <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-accent-700 mr-3"></span>
+                            Creative Front-end</li>
+                        <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-accent-700 mr-3"></span>
+                            Responsive Design</li>
+                        <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-accent-700 mr-3"></span>
+                            Interactive Experiences</li>
+                    </ul>
+                </div>
+
+                <!-- Service 2: Motion Design -->
+                <div
+                    class="glass-panel p-10 rounded-3xl relative overflow-hidden group hover:-translate-y-2 transition-transform duration-300 gs-reveal">
+                    <div
+                        class="absolute top-0 right-0 w-32 h-32 bg-accent-600 filter blur-[80px] opacity-20 group-hover:opacity-40 transition-opacity">
+                    </div>
+                    <div
+                        class="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mb-8 border border-white/10">
+                        <svg class="w-6 h-6 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="font-display text-2xl font-bold mb-4">Motion Design</h3>
+                    <p class="text-gray-400 mb-6 leading-relaxed">
+                        Breathing life into products with dynamic animations. Whether it's product explainers,
+                        micro-interactions, or promotional videos, motion builds engagement and trust.
+                    </p>
+                    <ul class="space-y-3 text-sm text-gray-300 font-medium">
+                        <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-accent-600 mr-3"></span>
+                            Product Animations</li>
+                        <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-accent-600 mr-3"></span>
+                            UI/UX Micro-interactions</li>
+                        <li class="flex items-center"><span class="w-1.5 h-1.5 rounded-full bg-accent-600 mr-3"></span>
+                            Branding Motion</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="work" class="py-32 relative bg-dark overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-24 gs-reveal">
+                <h2 class="font-display text-5xl md:text-6xl font-bold mb-6">Selected <span
+                        class="text-gradient">Works</span></h2>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto">A curated collection of digital experiences and
+                    motion graphics crafted to captivate and convert.</p>
+            </div>
+
+            <div class="space-y-32">
+
+                <!-- Project 1: Motion Design (Shake It Up) - Left Media -->
+                <div class="relative flex flex-col lg:flex-row items-center gap-8 lg:gap-0 gs-reveal group">
+                    <div
+                        class="absolute top-1/2 left-1/4 w-96 h-96 bg-accent-600 rounded-full mix-blend-screen filter blur-[150px] opacity-20 -translate-y-1/2 pointer-events-none transition-opacity duration-700 group-hover:opacity-40">
+                    </div>
+
+                    <div
+                        class="w-full lg:w-7/12 rounded-3xl overflow-hidden relative border border-white/5 z-10 shadow-2xl aspect-[16/10]">
+                        <!-- ADD YOUR "SHAKE IT UP" VIDEO HERE -->
+                        <video autoplay loop muted playsinline
+                            poster="https://placehold.co/1200x800/2a0a2a/ffffff?text=Shake+It+Up+Video"
+                            class="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105">
+                            <source src="milkshake.mp4" type="video/mp4">
+                        </video>
+                        <div
+                            class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 pointer-events-none">
+                        </div>
+                    </div>
+
+                    <div class="w-full lg:w-6/12 lg:-ml-24 z-20">
+                        <div
+                            class="glass-panel p-8 md:p-12 rounded-3xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                            <div class="flex items-center gap-4 mb-4">
+                                <span
+                                    class="px-4 py-1.5 rounded-full bg-accent-600/20 text-accent-600 text-xs font-bold tracking-widest uppercase border border-accent-600/30">Motion
+                                    Design</span>
+                                <span class="text-gray-500 text-sm">2026</span>
+                            </div>
+                            <h3
+                                class="font-display text-3xl md:text-4xl font-bold text-white mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-gray-400 transition-all">
+                                Shake It Up</h3>
+                            <p class="text-gray-400 mb-8 leading-relaxed">A vibrant, energetic promotional video for a
+                                modern milkshake brand. Features kinetic typography and dynamic fluid animations
+                                designed to drive high engagement on social media.</p>
+
+                            <div class="flex flex-wrap gap-2 mb-8">
+                                <span
+                                    class="px-3 py-1 rounded-md bg-white/5 text-gray-300 text-sm border border-white/5">After
+                                    Effects</span>
+                                <span
+                                    class="px-3 py-1 rounded-md bg-white/5 text-gray-300 text-sm border border-white/5">Cinema
+                                    4D</span>
+                            </div>
+
+                            <button
+                                class="open-video-btn inline-flex items-center text-white font-medium hover:text-accent-600 transition-colors group/btn">
+                                Watch Full Reel
+                                <svg class="w-5 h-5 ml-2 transform group-hover/btn:translate-x-2 transition-transform"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 2: Web Development (Icecream Store) - Right Media -->
+                <div class="relative flex flex-col lg:flex-row-reverse items-center gap-8 lg:gap-0 gs-reveal group">
+                    <div
+                        class="absolute top-1/2 right-1/4 w-96 h-96 bg-accent-500 rounded-full mix-blend-screen filter blur-[150px] opacity-20 -translate-y-1/2 pointer-events-none transition-opacity duration-700 group-hover:opacity-40">
+                    </div>
+
+                    <div
+                        class="w-full lg:w-7/12 rounded-3xl overflow-hidden relative border border-white/5 z-10 shadow-2xl aspect-[16/10]">
+                        <!-- ICECREAM STORE SCREENSHOT -->
+                        <img src="icecream-preview.png"
+                            alt="Icecream Store Web Project"
+                            class="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105">
+                        <div
+                            class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500">
+                        </div>
+                    </div>
+
+                    <div class="w-full lg:w-6/12 lg:-mr-24 z-20">
+                        <div
+                            class="glass-panel p-8 md:p-12 rounded-3xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                            <div class="flex items-center gap-4 mb-4">
+                                <span
+                                    class="px-4 py-1.5 rounded-full bg-accent-500/20 text-accent-500 text-xs font-bold tracking-widest uppercase border border-accent-500/30">Web
+                                    Dev</span>
+                                <span class="text-gray-500 text-sm">2026</span>
+                            </div>
+                            <h3
+                                class="font-display text-3xl md:text-4xl font-bold text-white mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-gray-400 transition-all">
+                                Artisanal Icecream Store</h3>
+                            <p class="text-gray-400 mb-8 leading-relaxed">A playful yet premium e-commerce experience
+                                for a boutique ice cream parlor. Built with a focus on fluid scrolling transitions,
+                                mouth-watering visuals, and a seamless checkout flow.</p>
+
+                            <div class="flex flex-wrap gap-2 mb-8">
+                                <span
+                                    class="px-3 py-1 rounded-md bg-white/5 text-gray-300 text-sm border border-white/5">HTML/Tailwind</span>
+                                <span
+                                    class="px-3 py-1 rounded-md bg-white/5 text-gray-300 text-sm border border-white/5">JS/GSAP</span>
+                                <span
+                                    class="px-3 py-1 rounded-md bg-white/5 text-gray-300 text-sm border border-white/5">Figma</span>
+                            </div>
+
+                            <a href="https://icecream-flame.vercel.app/" target="_blank" rel="noopener noreferrer"
+                                class="inline-flex items-center text-white font-medium hover:text-accent-500 transition-colors group/btn">
+                                Explore Live Site
+                                <svg class="w-5 h-5 ml-2 transform group-hover/btn:translate-x-2 transition-transform"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 3: Motion Design (Nutri Tracker) - Left Media -->
+                <div class="relative flex flex-col lg:flex-row items-center gap-8 lg:gap-0 gs-reveal group">
+                    <div
+                        class="absolute top-1/2 left-1/4 w-96 h-96 bg-accent-700 rounded-full mix-blend-screen filter blur-[150px] opacity-20 -translate-y-1/2 pointer-events-none transition-opacity duration-700 group-hover:opacity-40">
+                    </div>
+
+                    <div
+                        class="w-full lg:w-7/12 rounded-3xl overflow-hidden relative border border-white/5 z-10 shadow-2xl aspect-[16/10]">
+                        <!-- ADD YOUR "NUTRI TRACKER" VIDEO HERE -->
+                        <video autoplay loop muted playsinline
+                            poster="https://placehold.co/1200x800/0a2a2a/ffffff?text=Nutri+Tracker+App"
+                            class="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-105">
+                            <source src="nutitracker.mp4" type="video/mp4">
+                        </video>
+                        <div
+                            class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 pointer-events-none">
+                        </div>
+                    </div>
+
+                    <div class="w-full lg:w-6/12 lg:-ml-24 z-20">
+                        <div
+                            class="glass-panel p-8 md:p-12 rounded-3xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                            <div class="flex items-center gap-4 mb-4">
+                                <span
+                                    class="px-4 py-1.5 rounded-full bg-accent-700/20 text-accent-700 text-xs font-bold tracking-widest uppercase border border-accent-700/30">UI/UX
+                                    Motion</span>
+                                <span class="text-gray-500 text-sm">2025</span>
+                            </div>
+                            <h3
+                                class="font-display text-3xl md:text-4xl font-bold text-white mb-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-gray-400 transition-all">
+                                Nutri Tracker App</h3>
+                            <p class="text-gray-400 mb-8 leading-relaxed">Smooth micro-interactions and an engaging app
+                                walkthrough animation for a modern health and fitness tracking application. Designed to
+                                showcase the app's intuitive user flow and data visualization.</p>
+
+                            <div class="flex flex-wrap gap-2 mb-8">
+                                <span
+                                    class="px-3 py-1 rounded-md bg-white/5 text-gray-300 text-sm border border-white/5">After
+                                    Effects</span>
+                                <span
+                                    class="px-3 py-1 rounded-md bg-white/5 text-gray-300 text-sm border border-white/5">Lottie</span>
+                                <span
+                                    class="px-3 py-1 rounded-md bg-white/5 text-gray-300 text-sm border border-white/5">Figma</span>
+                            </div>
+
+                            <button
+                                class="open-video-btn inline-flex items-center text-white font-medium hover:text-accent-700 transition-colors group/btn">
+                                View Case Study
+                                <svg class="w-5 h-5 ml-2 transform group-hover/btn:translate-x-2 transition-transform"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="text-center mt-32 gs-reveal">
+                <a href="#"
+                    class="inline-flex items-center justify-center px-8 py-4 glass-panel text-white rounded-full font-medium hover:bg-white/10 transition-colors border border-white/10 group">
+                    View Complete Archive
+                    <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="py-32 relative bg-darker overflow-hidden">
+        <!-- Background element -->
+        <div
+            class="absolute -left-40 top-20 w-96 h-96 bg-accent-500 rounded-full mix-blend-screen filter blur-[150px] opacity-10">
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="max-w-3xl mx-auto text-center items-center">
+                <div class="gs-reveal">
+                    <h2 class="font-display text-4xl md:text-5xl font-bold mb-6">Why Work With Me?</h2>
+                    <p class="text-gray-400 text-lg mb-8 leading-relaxed mx-auto">
+                        I bridge the gap between aesthetics and performance. By combining deep technical knowledge in
+                        web development with a keen eye for motion design, I create digital experiences that don't just
+                        look good—they convert, engage, and build trust for your brand.
+                    </p>
+                    <div class="flex gap-8 justify-center mb-8">
+                        <div>
+                            <h4 class="font-display text-3xl font-bold text-white">2+</h4>
+                            <span class="text-sm text-gray-500 uppercase tracking-wider">Years Exp.</span>
+                        </div>
+                        <div>
+                            <h4 class="font-display text-3xl font-bold text-white">20+</h4>
+                            <span class="text-sm text-gray-500 uppercase tracking-wider">Projects</span>
+                        </div>
+                        <div>
+                            <h4 class="font-display text-3xl font-bold text-white">100%</h4>
+                            <span class="text-sm text-gray-500 uppercase tracking-wider">Commitment</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Infinite Logo Marquee to build trust -->
+        <div class="mt-24 border-y border-white/5 py-8 overflow-hidden relative flex">
+            <div class="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-darker to-transparent z-10"></div>
+            <div class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-darker to-transparent z-10"></div>
+
+            <div
+                class="flex space-x-16 whitespace-nowrap animate-marquee items-center opacity-50 hover:opacity-100 transition-opacity">
+                <!-- Repeated logos to ensure infinite feel -->
+                <span class="font-display font-bold text-2xl text-gray-400">ACOUSTIC</span>
+                <span class="font-display font-bold text-2xl text-gray-400">OXYGEN</span>
+                <span class="font-display font-bold text-2xl text-gray-400">LUMINA</span>
+                <span class="font-display font-bold text-2xl text-gray-400">VELOCITY</span>
+                <span class="font-display font-bold text-2xl text-gray-400">ECLIPSE</span>
+                <!-- Duplicate -->
+                <span class="font-display font-bold text-2xl text-gray-400">ACOUSTIC</span>
+                <span class="font-display font-bold text-2xl text-gray-400">OXYGEN</span>
+                <span class="font-display font-bold text-2xl text-gray-400">LUMINA</span>
+                <span class="font-display font-bold text-2xl text-gray-400">VELOCITY</span>
+                <span class="font-display font-bold text-2xl text-gray-400">ECLIPSE</span>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="py-32 relative bg-dark text-center overflow-hidden">
+        <div class="max-w-4xl mx-auto px-6 relative z-10">
+            <h2 class="font-display text-5xl md:text-7xl font-bold mb-8 gs-reveal">Got a project in <span
+                    class="text-gradient">mind?</span></h2>
+            <p class="text-xl text-gray-400 mb-12 gs-reveal">Let's collaborate and build something extraordinary
+                together.</p>
+
+            <a href="mailto:ajay2004r12@gmail.com" class="inline-block relative group gs-reveal hover-target">
+                <div
+                    class="absolute inset-0 bg-gradient-to-r from-accent-500 to-accent-600 rounded-full blur-md opacity-75 group-hover:opacity-100 transition duration-300">
+                </div>
+                <div
+                    class="relative px-10 py-5 bg-black rounded-full font-bold text-xl text-white flex items-center border border-white/10 group-hover:bg-transparent transition-colors">
+                    ajay2004r12@gmail.com
+                </div>
+            </a>
+
+            <div class="mt-20 flex justify-center space-x-6 text-gray-500 gs-reveal">
+                <a href="mailto:ajay2004r12@gmail.com" class="hover:text-white transition-colors hover-target">Email</a>
+                <a href="https://www.linkedin.com/in/ajay-r-434220268" target="_blank" rel="noopener noreferrer"
+                    class="hover:text-white transition-colors hover-target">LinkedIn</a>
+                <a href="https://www.instagram.com/aj_ay_16?igsh=MWFrdXExM3B4ZWVucQ%3D%3D&utm_source=qr" target="_blank"
+                    rel="noopener noreferrer" class="hover:text-white transition-colors hover-target">Instagram</a>
+            </div>
+        </div>
+
+        <div class="mt-20 border-t border-white/10 pt-8 text-center text-sm text-gray-600">
+            <p>&copy; 2026 PIXDRIFT. All rights reserved.</p>
+        </div>
+    </section>
+
+    <!-- Video Modal -->
+    <div id="video-modal"
+        class="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-md hidden flex-col items-center justify-center opacity-0 transition-opacity duration-300">
+        <button id="close-modal"
+            class="absolute top-6 right-6 text-white hover:text-accent-500 transition-colors z-50 p-2 cursor-pointer">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+        <div class="w-full max-w-6xl p-4 md:p-12 relative flex justify-center">
+            <video id="modal-video" class="w-full max-h-[80vh] rounded-xl shadow-2xl outline-none" controls playsinline>
+                <source src="" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </div>
+
+    <script>
+        // Interactive Canvas Background (Node network)
+        const canvas = document.getElementById('hero-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 1;
+                this.vy = (Math.random() - 0.5) * 1;
+                this.radius = Math.random() * 2;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(139, 92, 246, 0.5)'; // accent-500
+                ctx.fill();
+            }
+        }
+
+        // Initialize particles based on screen size to prevent lag
+        const particleCount = window.innerWidth > 768 ? 80 : 40;
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        let mouse = { x: null, y: null, radius: 150 };
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, width, height);
+
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+
+                // Connect particles to each other
+                for (let j = i; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 100) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${0.1 - distance / 1000})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+
+                // Connect to mouse
+                if (mouse.x != null) {
+                    const dx = particles[i].x - mouse.x;
+                    const dy = particles[i].y - mouse.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < mouse.radius) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(139, 92, 246, ${0.3 - distance / (mouse.radius * 3)})`;
+                        ctx.lineWidth = 1;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(mouse.x, mouse.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateCanvas);
+        }
+        animateCanvas();
+
+        // GSAP Scroll Animations
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Animate elements with .gs-reveal class as they enter viewport
+        gsap.utils.toArray('.gs-reveal').forEach(function (elem) {
+            gsap.fromTo(elem,
+                { y: 50, opacity: 0 },
+                {
+                    y: 0,
+                    opacity: 1,
+                    duration: 1,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: elem,
+                        start: "top 85%", // Trigger when element is 85% from top of viewport
+                        toggleActions: "play none none none"
+                    }
+                }
+            );
+        });
+
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('py-2');
+                navbar.classList.remove('py-4');
+            } else {
+                navbar.classList.add('py-4');
+                navbar.classList.remove('py-2');
+            }
+        });
+
+        // Mobile Menu Logic
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+        let menuOpen = false;
+
+        const toggleMenu = () => {
+            menuOpen = !menuOpen;
+            if (menuOpen) {
+                mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
+                mobileMenu.classList.add('opacity-100', 'pointer-events-auto');
+                mobileBtn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
+            } else {
+                mobileMenu.classList.add('opacity-0', 'pointer-events-none');
+                mobileMenu.classList.remove('opacity-100', 'pointer-events-auto');
+                mobileBtn.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>';
+                document.body.style.overflow = ''; // Restore scrolling
+            }
+        };
+
+        mobileBtn.addEventListener('click', toggleMenu);
+        mobileLinks.forEach(link => link.addEventListener('click', toggleMenu));
+
+        // Video Modal Logic
+        const videoModal = document.getElementById('video-modal');
+        const modalVideo = document.getElementById('modal-video');
+        const closeModalBtn = document.getElementById('close-modal');
+        const openVideoBtns = document.querySelectorAll('.open-video-btn');
+
+        function openVideoModal(src) {
+            // Guard clause to check if the user has added a video link yet
+            if (!src || src === "") {
+                alert("Please add your video file path to the <source src='...'> tag first!");
+                return;
+            }
+            modalVideo.src = src;
+            videoModal.classList.remove('hidden');
+            videoModal.classList.add('flex');
+
+            // Small delay to allow CSS block rendering before fading in
+            setTimeout(() => {
+                videoModal.classList.remove('opacity-0');
+            }, 10);
+
+            modalVideo.play().catch(e => console.log("Autoplay prevented:", e));
+            document.body.style.overflow = 'hidden'; // Freezes the scroll position behind the modal
+        }
+
+        function closeVideoModal() {
+            videoModal.classList.add('opacity-0');
+            setTimeout(() => {
+                videoModal.classList.add('hidden');
+                videoModal.classList.remove('flex');
+                modalVideo.pause();
+                modalVideo.currentTime = 0;
+                modalVideo.removeAttribute('src'); // Clear video source
+                modalVideo.load();
+            }, 300); // Matches duration-300 class
+            document.body.style.overflow = ''; // Restores scrolling right where you left off
+        }
+
+        // Attach click event to "Watch Full Reel" buttons
+        openVideoBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Finds the project group and dynamically grabs whichever video is inside it
+                const projectContainer = btn.closest('.group');
+                const source = projectContainer.querySelector('video source').getAttribute('src');
+                openVideoModal(source);
+            });
+        });
+
+        closeModalBtn.addEventListener('click', closeVideoModal);
+
+        // Close when clicking the dark background around the video
+        videoModal.addEventListener('click', (e) => {
+            if (e.target === videoModal) {
+                closeVideoModal();
+            }
+        });
+
+        // Close via Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !videoModal.classList.contains('hidden')) {
+                closeVideoModal();
+            }
+        });
+
+    </script>
+
+    <!-- Ferrofluid WebGL Background Script -->
+    <script>
+    (function() {
+        const ferroCanvas = document.getElementById('ferrofluid-bg');
+        if (!ferroCanvas) return;
+
+        const gl = ferroCanvas.getContext('webgl', {
+            alpha: true,
+            antialias: true,
+            premultipliedAlpha: false
+        });
+        if (!gl) { console.warn('WebGL not supported for Ferrofluid'); return; }
+
+        gl.clearColor(0, 0, 0, 0);
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+        // --- Config (matches the React props) ---
+        const CONFIG = {
+            colors: ['#a78282', '#b48888', '#ed8c8c'],
+            speed: 0.5,
+            scale: 1.6,
+            turbulence: 1,
+            fluidity: 0.1,
+            rimWidth: 0.2,
+            sharpness: 2.5,
+            shimmer: 1.5,
+            glow: 2,
+            flowDirection: 'down',
+            opacity: 1,
+            mouseInteraction: true,
+            mouseStrength: 1,
+            mouseRadius: 0.35,
+            mouseDampening: 0.15
+        };
+
+        const MAX_COLORS = 8;
+
+        function hexToRGB(hex) {
+            const c = hex.replace('#', '').padEnd(6, '0');
+            return [
+                parseInt(c.slice(0, 2), 16) / 255,
+                parseInt(c.slice(2, 4), 16) / 255,
+                parseInt(c.slice(4, 6), 16) / 255
+            ];
+        }
+
+        function prepColors(input) {
+            const base = (input && input.length ? input : ['#4F46E5', '#06B6D4', '#E0F2FE']).slice(0, MAX_COLORS);
+            const count = base.length;
+            const arr = [];
+            for (let i = 0; i < MAX_COLORS; i++) arr.push(hexToRGB(base[Math.min(i, base.length - 1)]));
+            const avg = [0, 0, 0];
+            for (let i = 0; i < count; i++) {
+                avg[0] += arr[i][0]; avg[1] += arr[i][1]; avg[2] += arr[i][2];
+            }
+            avg[0] /= count; avg[1] /= count; avg[2] /= count;
+            return { arr, count, avg };
+        }
+
+        function flowVec(d) {
+            switch (d) {
+                case 'up': return [0, 1];
+                case 'down': return [0, -1];
+                case 'left': return [-1, 0];
+                case 'right': return [1, 0];
+                default: return [0, -1];
+            }
+        }
+
+        // --- Shaders ---
+        const vertSrc = `
+            attribute vec2 position;
+            attribute vec2 uv;
+            varying vec2 vUv;
+            void main() {
+                vUv = uv;
+                gl_Position = vec4(position, 0.0, 1.0);
+            }
+        `;
+
+        const fragSrc = `
+            precision highp float;
+
+            uniform vec3  iResolution;
+            uniform vec2  iMouse;
+            uniform float iTime;
+
+            uniform vec3  uColor0;
+            uniform vec3  uColor1;
+            uniform vec3  uColor2;
+            uniform vec3  uColor3;
+            uniform vec3  uColor4;
+            uniform vec3  uColor5;
+            uniform vec3  uColor6;
+            uniform vec3  uColor7;
+            uniform int   uColorCount;
+
+            uniform vec3  uMouseColor;
+            uniform vec2  uFlow;
+            uniform float uSpeed;
+            uniform float uScale;
+            uniform float uTurbulence;
+            uniform float uFluidity;
+            uniform float uRimWidth;
+            uniform float uSharpness;
+            uniform float uShimmer;
+            uniform float uGlow;
+            uniform float uOpacity;
+            uniform float uMouseEnabled;
+            uniform float uMouseStrength;
+            uniform float uMouseRadius;
+
+            varying vec2 vUv;
+
+            #define PI 3.14159265
+
+            vec3 palette(float h) {
+                int count = uColorCount;
+                if (count < 1) count = 1;
+                int idx = int(floor(clamp(h, 0.0, 0.999999) * float(count)));
+                if (idx <= 0) return uColor0;
+                if (idx == 1) return uColor1;
+                if (idx == 2) return uColor2;
+                if (idx == 3) return uColor3;
+                if (idx == 4) return uColor4;
+                if (idx == 5) return uColor5;
+                if (idx == 6) return uColor6;
+                return uColor7;
+            }
+
+            float hash(vec3 p3) {
+                p3 = fract(p3 * 0.1031);
+                p3 += dot(p3, p3.zyx + 33.33);
+                return fract((p3.x + p3.y) * p3.z);
+            }
+
+            float smin(float a, float b, float k) {
+                float r = exp2(-a / k) + exp2(-b / k);
+                return -k * log2(r);
+            }
+
+            float sinlerp(float a, float b, float w) {
+                return mix(a, b, (sin(w * PI - PI / 2.0) + 1.0) / 2.0);
+            }
+
+            float vn(vec2 p, float s, float seed) {
+                vec2 cellp = floor(p / s);
+                vec2 relp = mod(p, s);
+                float g1 = hash(vec3(cellp, seed));
+                float g2 = hash(vec3(cellp.x + 1.0, cellp.y, seed));
+                float g3 = hash(vec3(cellp.x + 1.0, cellp.y + 1.0, seed));
+                float g4 = hash(vec3(cellp.x, cellp.y + 1.0, seed));
+                float bx = sinlerp(g1, g2, relp.x / s);
+                float tx = sinlerp(g4, g3, relp.x / s);
+                return sinlerp(bx, tx, relp.y / s);
+            }
+
+            float dbn(vec2 p, float s, float seed) {
+                float o = s / 2.0;
+                float n0 = vn(p, s, seed);
+                float n1 = vn(p + vec2(o, o), s, seed + 0.1);
+                float n2 = vn(p + vec2(-o, o), s, seed + 0.2);
+                float n3 = vn(p + vec2(o, -o), s, seed + 0.3);
+                float n4 = vn(p + vec2(-o, -o), s, seed + 0.4);
+                return (2.0 * n0 + 1.5 * n1 + 1.25 * n2 + 1.125 * n3 + n4) / 7.0;
+            }
+
+            void mainImage(out vec4 fragColor, in vec2 fragCoord) {
+                float ref = 700.0 / max(uScale, 0.05);
+                vec2 p = fragCoord / iResolution.y * ref;
+
+                float spd = 200.0 * uSpeed;
+                float t = iTime;
+
+                vec2 dir = uFlow;
+                vec2 perp = vec2(-dir.y, dir.x);
+
+                float distort1 = vn(p + perp * (t * spd), 60.0, 10.0) * 50.0 * uTurbulence;
+                float distort2 = vn(p - perp * (t * spd), 120.0, 15.0) * 100.0 * uTurbulence;
+
+                float peaks = dbn(p + distort1 + dir * (t * spd * 0.5), 40.0, 1.0);
+                float peaks2 = dbn(p + distort2 - dir * (t * spd * 0.5), 40.0, 0.0);
+
+                float mapeaks = smin(peaks, peaks2, max(uFluidity, 0.001));
+
+                float mGlow = 0.0;
+                if (uMouseEnabled > 0.5) {
+                    vec2 mp = iMouse / iResolution.y * ref;
+                    float md = length(p - mp) / ref;
+                    float rr = max(uMouseRadius, 0.02);
+                    mGlow = exp(-md * md / (rr * rr)) * uMouseStrength;
+                }
+
+                float band = (uRimWidth - abs((mapeaks - 0.4) * 2.0)) * 5.0;
+                float ltn = clamp(band - vn(p + dir * (t * spd * 0.5), 60.0, 12.0) * uShimmer, 0.0, 1.0);
+                ltn = pow(ltn, uSharpness) * uGlow;
+                ltn *= clamp(1.0 - mGlow, 0.0, 1.0);
+
+                float h = clamp(0.5 + (peaks - peaks2) * 0.8, 0.0, 1.0);
+                vec3 col = palette(h);
+
+                vec3 outc = col * ltn;
+                float a = clamp(max(outc.r, max(outc.g, outc.b)), 0.0, 1.0);
+                fragColor = vec4(outc, a * uOpacity);
+            }
+
+            void main() {
+                vec4 color;
+                mainImage(color, vUv * iResolution.xy);
+                gl_FragColor = color;
+            }
+        `;
+
+        // --- WebGL Helpers ---
+        function compileShader(type, src) {
+            const s = gl.createShader(type);
+            gl.shaderSource(s, src);
+            gl.compileShader(s);
+            if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+                console.error('Shader compile error:', gl.getShaderInfoLog(s));
+                gl.deleteShader(s);
+                return null;
+            }
+            return s;
+        }
+
+        const vs = compileShader(gl.VERTEX_SHADER, vertSrc);
+        const fs = compileShader(gl.FRAGMENT_SHADER, fragSrc);
+        if (!vs || !fs) return;
+
+        const program = gl.createProgram();
+        gl.attachShader(program, vs);
+        gl.attachShader(program, fs);
+        gl.linkProgram(program);
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+            console.error('Program link error:', gl.getProgramInfoLog(program));
+            return;
+        }
+        gl.useProgram(program);
+
+        // --- Full-screen triangle geometry ---
+        const posLoc = gl.getAttribLocation(program, 'position');
+        const uvLoc = gl.getAttribLocation(program, 'uv');
+
+        const posBuf = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, posBuf);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+        gl.enableVertexAttribArray(posLoc);
+        gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+        const uvBuf = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, uvBuf);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0, 0, 2, 0, 0, 2]), gl.STATIC_DRAW);
+        gl.enableVertexAttribArray(uvLoc);
+        gl.vertexAttribPointer(uvLoc, 2, gl.FLOAT, false, 0, 0);
+
+        // --- Uniforms ---
+        const loc = name => gl.getUniformLocation(program, name);
+
+        const { arr: colorArr, count: colorCount, avg: colorAvg } = prepColors(CONFIG.colors);
+        const flow = flowVec(CONFIG.flowDirection);
+
+        for (let i = 0; i < MAX_COLORS; i++) {
+            gl.uniform3fv(loc('uColor' + i), colorArr[i]);
+        }
+        gl.uniform1i(loc('uColorCount'), colorCount);
+        gl.uniform3fv(loc('uMouseColor'), colorAvg);
+        gl.uniform2fv(loc('uFlow'), flow);
+        gl.uniform1f(loc('uSpeed'), CONFIG.speed);
+        gl.uniform1f(loc('uScale'), CONFIG.scale);
+        gl.uniform1f(loc('uTurbulence'), CONFIG.turbulence);
+        gl.uniform1f(loc('uFluidity'), CONFIG.fluidity);
+        gl.uniform1f(loc('uRimWidth'), CONFIG.rimWidth);
+        gl.uniform1f(loc('uSharpness'), CONFIG.sharpness);
+        gl.uniform1f(loc('uShimmer'), CONFIG.shimmer);
+        gl.uniform1f(loc('uGlow'), CONFIG.glow);
+        gl.uniform1f(loc('uOpacity'), CONFIG.opacity);
+        gl.uniform1f(loc('uMouseEnabled'), CONFIG.mouseInteraction ? 1 : 0);
+        gl.uniform1f(loc('uMouseStrength'), CONFIG.mouseStrength);
+        gl.uniform1f(loc('uMouseRadius'), CONFIG.mouseRadius);
+
+        const iResLoc = loc('iResolution');
+        const iMouseLoc = loc('iMouse');
+        const iTimeLoc = loc('iTime');
+
+        // --- Resize ---
+        function resizeFerro() {
+            const dpr = window.devicePixelRatio || 1;
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            ferroCanvas.width = w * dpr;
+            ferroCanvas.height = h * dpr;
+            ferroCanvas.style.width = w + 'px';
+            ferroCanvas.style.height = h + 'px';
+            gl.viewport(0, 0, ferroCanvas.width, ferroCanvas.height);
+            gl.uniform3f(iResLoc, ferroCanvas.width, ferroCanvas.height, 1);
+        }
+        resizeFerro();
+        window.addEventListener('resize', resizeFerro);
+
+        // --- Mouse ---
+        const mouseTarget = [0, 0];
+        const mouseCurrent = [0, 0];
+        let lastTime = 0;
+
+        if (CONFIG.mouseInteraction) {
+            ferroCanvas.style.pointerEvents = 'auto';
+            window.addEventListener('pointermove', function(e) {
+                const dpr = window.devicePixelRatio || 1;
+                mouseTarget[0] = e.clientX * dpr;
+                mouseTarget[1] = (window.innerHeight - e.clientY) * dpr;
+                if (CONFIG.mouseDampening <= 0) {
+                    mouseCurrent[0] = mouseTarget[0];
+                    mouseCurrent[1] = mouseTarget[1];
+                }
+            });
+        }
+
+        // --- Render Loop ---
+        function ferroLoop(t) {
+            requestAnimationFrame(ferroLoop);
+
+            gl.uniform1f(iTimeLoc, t * 0.001);
+
+            // Mouse dampening
+            if (CONFIG.mouseDampening > 0) {
+                if (!lastTime) lastTime = t;
+                const dt = (t - lastTime) / 1000;
+                lastTime = t;
+                const tau = Math.max(1e-4, CONFIG.mouseDampening);
+                let factor = 1 - Math.exp(-dt / tau);
+                if (factor > 1) factor = 1;
+                mouseCurrent[0] += (mouseTarget[0] - mouseCurrent[0]) * factor;
+                mouseCurrent[1] += (mouseTarget[1] - mouseCurrent[1]) * factor;
+            } else {
+                lastTime = t;
+            }
+            gl.uniform2fv(iMouseLoc, mouseCurrent);
+
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.drawArrays(gl.TRIANGLES, 0, 3);
+        }
+        requestAnimationFrame(ferroLoop);
+    })();
+    </script>
+</body>
+
+</html>
