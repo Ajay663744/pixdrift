@@ -136,6 +136,147 @@
         .project-card:hover video {
             transform: scale(1.05);
         }
+
+        /* ===== Liquid Glass Effect System ===== */
+        .liquid-glass {
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.7s cubic-bezier(0.175, 0.885, 0.32, 2.2);
+            box-shadow: 0 6px 6px rgba(0, 0, 0, 0.2), 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .liquid-glass::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            border-radius: inherit;
+            backdrop-filter: blur(12px) saturate(1.8);
+            -webkit-backdrop-filter: blur(12px) saturate(1.8);
+            filter: url(#glass-distortion);
+            isolation: isolate;
+        }
+
+        .liquid-glass::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            border-radius: inherit;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow:
+                inset 2px 2px 1px 0 rgba(255, 255, 255, 0.25),
+                inset -1px -1px 1px 1px rgba(255, 255, 255, 0.15);
+        }
+
+        .liquid-glass > * {
+            position: relative;
+            z-index: 3;
+        }
+
+        /* Navbar glass */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-nav:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Glass buttons */
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .glass-btn:hover {
+            background: rgba(255, 255, 255, 0.10);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 40px rgba(139, 92, 246, 0.1);
+        }
+
+        .glass-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* Primary glass button (filled) */
+        .glass-btn-primary {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .glass-btn-primary:hover {
+            background: rgba(255, 255, 255, 0.22);
+            border-color: rgba(255, 255, 255, 0.35);
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 40px rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-btn-primary:active {
+            transform: scale(0.97);
+        }
+
+        /* Small nav button */
+        .glass-btn-sm {
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        .glass-btn-sm:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.08);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25), 0 0 20px rgba(139, 92, 246, 0.15);
+        }
+
+        /* Contact glass CTA */
+        .glass-btn-glow {
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .glass-btn-glow:hover {
+            background: rgba(139, 92, 246, 0.25);
+            border-color: rgba(139, 92, 246, 0.5);
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.3), 0 0 60px rgba(139, 92, 246, 0.15);
+        }
+
+        .glass-btn-glow:active {
+            transform: scale(0.97);
+        }
+
+        /* Shimmer highlight sweep on glass elements */
+        .glass-shimmer {
+            overflow: hidden;
+        }
+
+        .glass-shimmer .shimmer-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 4;
+            border-radius: inherit;
+            background: linear-gradient(
+                120deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.06) 38%,
+                rgba(255, 255, 255, 0.12) 40%,
+                rgba(255, 255, 255, 0.06) 42%,
+                transparent 50%
+            );
+            background-size: 200% 100%;
+            background-position: 200% 0;
+            transition: background-position 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            pointer-events: none;
+        }
+
+        .glass-shimmer:hover .shimmer-layer {
+            background-position: -200% 0;
+        }
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -149,10 +290,29 @@
 
     <div class="noise-bg"></div>
 
+    <!-- SVG Glass Distortion Filter -->
+    <svg style="display: none; position: absolute; width: 0; height: 0;">
+        <filter id="glass-distortion" x="0%" y="0%" width="100%" height="100%" filterUnits="objectBoundingBox">
+            <feTurbulence type="fractalNoise" baseFrequency="0.001 0.005" numOctaves="1" seed="17" result="turbulence" />
+            <feComponentTransfer in="turbulence" result="mapped">
+                <feFuncR type="gamma" amplitude="1" exponent="10" offset="0.5" />
+                <feFuncG type="gamma" amplitude="0" exponent="1" offset="0" />
+                <feFuncB type="gamma" amplitude="0" exponent="1" offset="0.5" />
+            </feComponentTransfer>
+            <feGaussianBlur in="turbulence" stdDeviation="3" result="softMap" />
+            <feSpecularLighting in="softMap" surfaceScale="5" specularConstant="1" specularExponent="100" lightingColor="white" result="specLight">
+                <fePointLight x="-200" y="-200" z="300" />
+            </feSpecularLighting>
+            <feComposite in="specLight" operator="arithmetic" k1="0" k2="1" k3="1" k4="0" result="litImage" />
+            <feDisplacementMap in="SourceGraphic" in2="softMap" scale="200" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+    </svg>
+
     <!-- Navigation -->
     <nav class="fixed w-full z-50 top-0 transition-all duration-300" id="navbar">
         <div
-            class="glass-panel mx-auto max-w-7xl px-6 py-4 mt-4 rounded-full flex justify-between items-center w-[95%] lg:w-full relative z-50">
+            class="liquid-glass glass-nav glass-shimmer mx-auto max-w-7xl px-6 py-4 mt-4 rounded-full flex justify-between items-center w-[95%] lg:w-full relative z-50">
+            <span class="shimmer-layer"></span>
             <a href="#" class="font-display font-bold text-xl tracking-wider text-white hover-target relative z-50">
                 PIXDRIFT <span class="text-accent-500">|</span> AJAY.
             </a>
@@ -166,8 +326,9 @@
 
             <div class="hidden md:block">
                 <a href="#contact"
-                    class="bg-white text-black px-6 py-2 rounded-full font-semibold text-sm hover:scale-105 transition-transform hover-target">
-                    Let's Talk
+                    class="liquid-glass glass-btn-sm glass-shimmer px-6 py-2 rounded-full font-semibold text-sm text-white hover-target inline-block">
+                    <span class="shimmer-layer"></span>
+                    <span class="relative z-10">Let's Talk</span>
                 </a>
             </div>
 
@@ -188,8 +349,10 @@
                 <a href="#work" class="mobile-link text-gray-300 hover:text-white transition-colors">Work</a>
                 <a href="#about" class="mobile-link text-gray-300 hover:text-white transition-colors">About</a>
                 <a href="#contact"
-                    class="mobile-link mt-8 px-8 py-3 bg-gradient-to-r from-accent-500 to-accent-600 text-white rounded-full text-lg shadow-lg shadow-accent-500/20">Let's
-                    Talk</a>
+                    class="mobile-link mt-8 liquid-glass glass-btn-glow glass-shimmer px-8 py-3 text-white rounded-full text-lg">
+                    <span class="shimmer-layer"></span>
+                    <span class="relative z-10">Let's Talk</span>
+                </a>
             </div>
         </div>
     </nav>
@@ -225,16 +388,20 @@
             <div
                 class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6 gs-reveal">
                 <a href="#work"
-                    class="px-8 py-4 bg-white text-black rounded-full font-semibold hover:bg-gray-200 transition-colors hover-target flex items-center">
-                    View My Work
-                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-                    </svg>
+                    class="liquid-glass glass-btn-primary glass-shimmer px-8 py-4 rounded-full font-semibold text-white hover-target flex items-center">
+                    <span class="shimmer-layer"></span>
+                    <span class="relative z-10 flex items-center">
+                        View My Work
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                        </svg>
+                    </span>
                 </a>
                 <a href="#services"
-                    class="px-8 py-4 glass-panel text-white rounded-full font-medium hover:bg-white/10 transition-colors hover-target">
-                    Our Services
+                    class="liquid-glass glass-btn glass-shimmer px-8 py-4 rounded-full font-medium text-white hover-target">
+                    <span class="shimmer-layer"></span>
+                    <span class="relative z-10">Our Services</span>
                 </a>
             </div>
         </div>
@@ -495,13 +662,16 @@
 
             <div class="text-center mt-32 gs-reveal">
                 <a href="#"
-                    class="inline-flex items-center justify-center px-8 py-4 glass-panel text-white rounded-full font-medium hover:bg-white/10 transition-colors border border-white/10 group">
-                    View Complete Archive
-                    <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-                    </svg>
+                    class="liquid-glass glass-btn glass-shimmer inline-flex items-center justify-center px-8 py-4 text-white rounded-full font-medium group">
+                    <span class="shimmer-layer"></span>
+                    <span class="relative z-10 flex items-center">
+                        View Complete Archive
+                        <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                        </svg>
+                    </span>
                 </a>
             </div>
         </div>
@@ -572,11 +742,12 @@
 
             <a href="mailto:ajay2004r12@gmail.com" class="inline-block relative group gs-reveal hover-target">
                 <div
-                    class="absolute inset-0 bg-gradient-to-r from-accent-500 to-accent-600 rounded-full blur-md opacity-75 group-hover:opacity-100 transition duration-300">
+                    class="absolute inset-0 bg-gradient-to-r from-accent-500 to-accent-600 rounded-full blur-md opacity-50 group-hover:opacity-80 transition duration-500">
                 </div>
                 <div
-                    class="relative px-10 py-5 bg-black rounded-full font-bold text-xl text-white flex items-center border border-white/10 group-hover:bg-transparent transition-colors">
-                    ajay2004r12@gmail.com
+                    class="relative liquid-glass glass-btn-glow glass-shimmer px-10 py-5 rounded-full font-bold text-xl text-white flex items-center">
+                    <span class="shimmer-layer"></span>
+                    <span class="relative z-10">ajay2004r12@gmail.com</span>
                 </div>
             </a>
 
@@ -584,8 +755,6 @@
                 <a href="mailto:ajay2004r12@gmail.com" class="hover:text-white transition-colors hover-target">Email</a>
                 <a href="https://www.linkedin.com/in/ajay-r-434220268" target="_blank" rel="noopener noreferrer"
                     class="hover:text-white transition-colors hover-target">LinkedIn</a>
-                <a href="https://www.instagram.com/aj_ay_16?igsh=MWFrdXExM3B4ZWVucQ%3D%3D&utm_source=qr" target="_blank"
-                    rel="noopener noreferrer" class="hover:text-white transition-colors hover-target">Instagram</a>
             </div>
         </div>
 
